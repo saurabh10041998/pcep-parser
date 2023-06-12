@@ -120,11 +120,11 @@ impl std::fmt::Display for StatefulPCECapabilityTLV {
 
 #[derive(Debug, PartialEq, Eq, Default)]
 pub struct SrPCECapabilityTLV {
-    tlv_type: u16,
-    tlv_length: u16,
-    reserved: u16,
-    flag_limit: bool,
-    max_sid_depth: u8,
+    pub tlv_type: u16,
+    pub tlv_length: u16,
+    pub reserved: u16,
+    pub flag_limit: bool,
+    pub max_sid_depth: u8,
 }
 
 impl SrPCECapabilityTLV {

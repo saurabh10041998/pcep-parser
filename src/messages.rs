@@ -170,6 +170,7 @@ mod tests {
     use super::*;
     use crate::classes::ObjectClassType;
     use crate::objects::{CommonObject, OpenObject};
+    use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, TLV};
     use crate::types::OpenObjectType;
     const EMPTY_SLICE: &[u8] = &[];
     #[test]
@@ -200,6 +201,25 @@ mod tests {
         let (_remaining, open_object) =
             OpenObject::parse_open_object(remaining).expect("[!!] Error while parsing open object");
 
+        let expected_spc_tlv = StatefulPCECapabilityTLV {
+            tlv_type: 16,
+            tlv_len: 4,
+            flag_lsp_update_capability: true,
+            flag_include_db_version: false,
+            flag_lsp_instantiate_capability: true,
+            flag_triggered_resync: false,
+            flag_delta_lsp_sync_capability: false,
+            flag_triggered_initial_sync: false,
+        };
+
+        let expected_srpc_tlv = SrPCECapabilityTLV {
+            tlv_type: 26,
+            tlv_length: 4,
+            reserved: 0,
+            flag_limit: false,
+            max_sid_depth: 10,
+        };
+
         let expected = OpenObject {
             common_object: CommonObject {
                 object_class_type: ObjectClassType::Open(OpenObjectType::Open),
@@ -213,7 +233,10 @@ mod tests {
             keepalive: 30,
             deadtimer: 120,
             sid: 1,
-            tlvs: None,
+            tlvs: Some(vec![
+                TLV::StatefulPCECapability(expected_spc_tlv),
+                TLV::SrPCECapability(expected_srpc_tlv),
+            ]),
         };
         assert_eq!(open_object, expected);
     }
