@@ -2,11 +2,11 @@ use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 
-mod tlvs;
 mod classes;
 mod common;
 mod messages;
 mod objects;
+mod tlvs;
 mod types;
 
 use messages::{CommonHeader, KeepAlive, MessageType, Open};

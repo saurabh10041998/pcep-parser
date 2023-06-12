@@ -7,8 +7,8 @@ use nom::{Err, IResult};
 
 use crate::classes::ObjectClassType;
 use crate::common::Version;
+use crate::tlvs::{StatefulPCECapabilityTLV, TLV};
 use crate::types::OpenObjectType;
-use crate::tlvs::{TLV, StatefulPCECapabilityTLV};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct CommonObject {
@@ -79,7 +79,7 @@ pub struct OpenObject {
     pub keepalive: u8,
     pub deadtimer: u8,
     pub sid: u8,
-    pub tlvs: Option<Vec<TLV>>
+    pub tlvs: Option<Vec<TLV>>,
 }
 
 impl OpenObject {
@@ -95,12 +95,10 @@ impl OpenObject {
         match tlv_type.into() {
             TLV::StatefulPCECapability(_) => {
                 // parse StatefulPCETLV
-               let (remaining, tlv) =  StatefulPCECapabilityTLV::parse_tlv(remaining)?;
-               Ok((remaining, TLV::StatefulPCECapability(tlv)))
-            },
-            TLV::Unknown(val) => {
-                Ok((remaining, TLV::Unknown(val)))
+                let (remaining, tlv) = StatefulPCECapabilityTLV::parse_tlv(remaining)?;
+                Ok((remaining, TLV::StatefulPCECapability(tlv)))
             }
+            TLV::Unknown(val) => Ok((remaining, TLV::Unknown(val))),
         }
     }
 
@@ -116,7 +114,7 @@ impl OpenObject {
                     }
                     tlvs.push(tlv);
                     left = remaining;
-                },
+                }
                 Err(e) => return Err(e),
             }
         }
@@ -137,7 +135,7 @@ impl OpenObject {
                 keepalive,
                 deadtimer,
                 sid,
-                tlvs: None
+                tlvs: None,
             };
             if remaining.len() > 0 {
                 // TLV section..
@@ -149,15 +147,12 @@ impl OpenObject {
         }
         Err(Err::Failure(Error::new(input, ErrorKind::Fail)))
     }
-
-
-
 }
 
 impl std::fmt::Display for OpenObject {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut tlvs_str = String::new();
-        if let Some(ref tlvs) = self.tlvs {            
+        if let Some(ref tlvs) = self.tlvs {
             for t in tlvs {
                 let output = format!("{}", t);
                 tlvs_str.push_str(&output)

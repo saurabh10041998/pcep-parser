@@ -205,7 +205,7 @@ mod tests {
             keepalive: 30,
             deadtimer: 120,
             sid: 1,
-            tlvs: None
+            tlvs: None,
         };
         assert_eq!(open_object, expected);
     }
