@@ -5,13 +5,13 @@ use nom::IResult;
 
 #[non_exhaustive]
 #[derive(Debug, PartialEq, Eq)]
-pub enum TLV {
+pub enum Tlv {
     StatefulPCECapability(StatefulPCECapabilityTLV),
     SrPCECapability(SrPCECapabilityTLV),
     Unknown(u16),
 }
 
-impl From<u16> for TLV {
+impl From<u16> for Tlv {
     fn from(value: u16) -> Self {
         match value {
             16 => Self::StatefulPCECapability(Default::default()),
@@ -21,7 +21,7 @@ impl From<u16> for TLV {
     }
 }
 
-impl std::fmt::Display for TLV {
+impl std::fmt::Display for Tlv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::StatefulPCECapability(spc) => {

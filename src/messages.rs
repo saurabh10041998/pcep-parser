@@ -170,7 +170,7 @@ mod tests {
     use super::*;
     use crate::classes::ObjectClassType;
     use crate::objects::{CommonObject, OpenObject};
-    use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, TLV};
+    use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, Tlv};
     use crate::types::OpenObjectType;
     const EMPTY_SLICE: &[u8] = &[];
     #[test]
@@ -234,8 +234,8 @@ mod tests {
             deadtimer: 120,
             sid: 1,
             tlvs: Some(vec![
-                TLV::StatefulPCECapability(expected_spc_tlv),
-                TLV::SrPCECapability(expected_srpc_tlv),
+                Tlv::StatefulPCECapability(expected_spc_tlv),
+                Tlv::SrPCECapability(expected_srpc_tlv),
             ]),
         };
         assert_eq!(open_object, expected);

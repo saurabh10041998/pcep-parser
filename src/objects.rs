@@ -8,7 +8,7 @@ use nom::{Err, IResult};
 
 use crate::classes::ObjectClassType;
 use crate::common::Version;
-use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, TLV};
+use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, Tlv};
 use crate::types::OpenObjectType;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -82,7 +82,7 @@ pub struct OpenObject {
     pub keepalive: u8,
     pub deadtimer: u8,
     pub sid: u8,
-    pub tlvs: Option<Vec<TLV>>,
+    pub tlvs: Option<Vec<Tlv>>,
 }
 
 impl OpenObject {
@@ -93,30 +93,30 @@ impl OpenObject {
         )))(input)
     }
 
-    fn parse_open_object_tlv(input: &[u8]) -> IResult<&[u8], TLV> {
+    fn parse_open_object_tlv(input: &[u8]) -> IResult<&[u8], Tlv> {
         let (remaining, tlv_type) = number::streaming::be_u16(input)?;
         match tlv_type.into() {
-            TLV::StatefulPCECapability(_) => {
+            Tlv::StatefulPCECapability(_) => {
                 // parse StatefulPCETLV
                 let (remaining, tlv) = StatefulPCECapabilityTLV::parse_tlv(remaining)?;
-                Ok((remaining, TLV::StatefulPCECapability(tlv)))
+                Ok((remaining, Tlv::StatefulPCECapability(tlv)))
             }
-            TLV::SrPCECapability(_) => {
+            Tlv::SrPCECapability(_) => {
                 //parse SRPCECapabilityTLV
                 let (remaining, tlv) = SrPCECapabilityTLV::parse_tlv(remaining)?;
-                Ok((remaining, TLV::SrPCECapability(tlv)))
+                Ok((remaining, Tlv::SrPCECapability(tlv)))
             }
-            TLV::Unknown(val) => Ok((remaining, TLV::Unknown(val))),
+            Tlv::Unknown(val) => Ok((remaining, Tlv::Unknown(val))),
         }
     }
 
-    fn parse_open_object_tlvs(input: &[u8]) -> IResult<&[u8], Vec<TLV>> {
+    fn parse_open_object_tlvs(input: &[u8]) -> IResult<&[u8], Vec<Tlv>> {
         let mut left = input;
         let mut tlvs = vec![];
-        while let Some(_) = left.first() {
+        while left.first().is_some() {
             match Self::parse_open_object_tlv(left) {
                 Ok((remaining, tlv)) => {
-                    if let TLV::Unknown(_) = tlv {
+                    if let Tlv::Unknown(_) = tlv {
                         //TODO : skip to the next tlv if this tlv is not parsable.
                         break;
                     }
@@ -145,7 +145,7 @@ impl OpenObject {
                 sid,
                 tlvs: None,
             };
-            if remaining.len() > 0 {
+            if !remaining.is_empty() {
                 // TLV section..
                 let (remaining, tlvs) = Self::parse_open_object_tlvs(remaining)?;
                 open_obj.tlvs = Some(tlvs);
