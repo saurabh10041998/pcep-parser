@@ -26,13 +26,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         MessageType::Open => {
             println!("[+] Pcep Open message..");
             match OpenObject::parse_open_object(remaining) {
-                Ok((remaining, open_object)) => {
-                    // Create OpenMessage..
+                Ok((_remaining, open_object)) => {
                     let open_msg = Open::new(common_header, open_object);
                     print!("{}", open_msg);
-
-                    println!("{:?}", remaining);
-                    println!("{}", remaining.len());
                 }
                 Err(e) => panic!("{:?}", e),
             }
@@ -40,6 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         MessageType::Keepalive => {
             assert_eq!(remaining.len(), 0, "[!!] Malformed Keepalive message");
             let keepalive_msg: KeepAlive = common_header.into();
+            println!("[+] Pcep keepalive message..");
             print!("{}", keepalive_msg);
         }
         _ => {

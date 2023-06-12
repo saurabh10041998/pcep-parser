@@ -1,3 +1,4 @@
+use colored::Colorize;
 use indoc::writedoc;
 use nom::bits;
 use nom::error::{Error, ErrorKind};
@@ -7,7 +8,7 @@ use nom::{Err, IResult};
 
 use crate::classes::ObjectClassType;
 use crate::common::Version;
-use crate::tlvs::{StatefulPCECapabilityTLV, TLV};
+use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, TLV};
 use crate::types::OpenObjectType;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -52,16 +53,18 @@ impl CommonObject {
 
 impl std::fmt::Display for CommonObject {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let title = "[[common object]]".bold();
         writedoc!(
             f,
             r#"
-            [[common object]]
+            {title}
                 (obj_class, obj_type) = {object_class_type}
                 reserved              = {reserved}
                 flag_process          = {flag_process}
                 flag_ignore           = {flag_ignore}
                 object_length         = {object_length}
             "#,
+            title = title,
             object_class_type = self.object_class_type,
             reserved = self.reserved,
             flag_process = self.flag_process,
@@ -98,6 +101,11 @@ impl OpenObject {
                 let (remaining, tlv) = StatefulPCECapabilityTLV::parse_tlv(remaining)?;
                 Ok((remaining, TLV::StatefulPCECapability(tlv)))
             }
+            TLV::SrPCECapability(_) => {
+                //parse SRPCECapabilityTLV
+                let (remaining, tlv) = SrPCECapabilityTLV::parse_tlv(remaining)?;
+                Ok((remaining, TLV::SrPCECapability(tlv)))
+            }
             TLV::Unknown(val) => Ok((remaining, TLV::Unknown(val))),
         }
     }
@@ -108,8 +116,8 @@ impl OpenObject {
         while let Some(_) = left.first() {
             match Self::parse_open_object_tlv(left) {
                 Ok((remaining, tlv)) => {
-                    if let TLV::Unknown(val) = tlv {
-                        println!("[!!] Unknown tlv occurred of type: {}", val);
+                    if let TLV::Unknown(_) = tlv {
+                        //TODO : skip to the next tlv if this tlv is not parsable.
                         break;
                     }
                     tlvs.push(tlv);
@@ -158,19 +166,21 @@ impl std::fmt::Display for OpenObject {
                 tlvs_str.push_str(&output)
             }
         }
+        let title = "==[Open Object]==".green().bold();
         writedoc!(
             f,
             r#"
-            ==[Open Object]==
+            {title}
                 {common_object}
                 version                 = {version}
                 flags                   = {flags}
                 keepalive               = {keepalive}
                 deadtimer               = {deadtimer}
                 sid                     = {sid}
-                
-                {tlv_str}
+
+            {tlv_str}
             "#,
+            title = title,
             common_object = self.common_object,
             version = self.version,
             flags = self.flags,

@@ -1,3 +1,4 @@
+use colored::Colorize;
 use indoc::writedoc;
 use nom::bits;
 use nom::error::Error;
@@ -65,15 +66,17 @@ pub struct CommonHeader {
 
 impl std::fmt::Display for CommonHeader {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let title = "==[Common Header]==".green().bold();
         writedoc!(
             f,
             r#"
-            ==[Common Header]==
+            {title}
                 version: {version},
                 flags: {flags},
                 message_type: {mtype},
                 message_length: {mlength}
             "#,
+            title = title,
             version = { self.version },
             flags = { self.flags },
             mtype = { self.message_type },
@@ -121,13 +124,15 @@ impl Open {
 
 impl std::fmt::Display for Open {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let title = "##[Open]##".yellow();
         writedoc!(
             f,
             r#"
-            ##[Open]##
+            {title}
                 {common_header}
                 {open_object}
             "#,
+            title = title,
             common_header = self.common_header,
             open_object = self.open_object
         )
@@ -147,12 +152,14 @@ impl From<CommonHeader> for KeepAlive {
 
 impl std::fmt::Display for KeepAlive {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let title = "##[KeepAlive]##".yellow();
         writedoc!(
             f,
             r#"
-            ##[KeepAlive]##
+            {title}
                 {common_header}
             "#,
+            title = title,
             common_header = self.common_header
         )
     }
@@ -192,6 +199,7 @@ mod tests {
             CommonHeader::parse_common_header(input).expect("[!!] Error in parsing common header");
         let (_remaining, open_object) =
             OpenObject::parse_open_object(remaining).expect("[!!] Error while parsing open object");
+
         let expected = OpenObject {
             common_object: CommonObject {
                 object_class_type: ObjectClassType::Open(OpenObjectType::Open),

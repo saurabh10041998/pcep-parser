@@ -3,4 +3,5 @@
 Crate aiming for making parsing of PCEP protocol messages.
 
 ## todo
-- [ ] Fix cicd errors due to TLV adding in open message
+- [ ] Fix cicd errors due to TLV adding in open message.
+- [ ] Fix clippy errors.
