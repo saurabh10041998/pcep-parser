@@ -2,6 +2,7 @@ use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 
+mod tlvs;
 mod classes;
 mod common;
 mod messages;
@@ -24,11 +25,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     match common_header.message_type {
         MessageType::Open => {
             println!("[+] Pcep Open message..");
-            match OpenObject::parse_open_object(&remaining) {
+            match OpenObject::parse_open_object(remaining) {
                 Ok((remaining, open_object)) => {
                     // Create OpenMessage..
                     let open_msg = Open::new(common_header, open_object);
-                    println!("{}", open_msg);
+                    print!("{}", open_msg);
 
                     println!("{:?}", remaining);
                     println!("{}", remaining.len());
@@ -39,7 +40,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         MessageType::Keepalive => {
             assert_eq!(remaining.len(), 0, "[!!] Malformed Keepalive message");
             let keepalive_msg: KeepAlive = common_header.into();
-            println!("{}", keepalive_msg);
+            print!("{}", keepalive_msg);
         }
         _ => {
             println!("[!!]Unknown message type detected");
