@@ -11,7 +11,8 @@ use crate::common::Version;
 use crate::objects::classes::ObjectClassType;
 use crate::objects::header::CommonObject;
 use crate::objects::types::OpenObjectType;
-use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, Tlv};
+use crate::tlvs::tlv_set::{SrPCECapabilityTLV, StatefulPCECapabilityTLV};
+use crate::tlvs::types::Tlv;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct OpenObject {

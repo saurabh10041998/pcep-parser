@@ -4,8 +4,8 @@ use crate::objects::types::SrpObjectType;
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum ObjectClassType {
     Open(OpenObjectType),
-    LSP(LspObjectType),
-    SRP(SrpObjectType),
+    Lsp(LspObjectType),
+    Srp(SrpObjectType),
     Unknown((u8, u8)),
 }
 
@@ -15,8 +15,8 @@ impl From<(u8, u8)> for ObjectClassType {
         let object_type = value.1;
         match object_class {
             1 => Self::Open(object_type.into()),
-            32 => Self::LSP(object_type.into()),
-            33 => Self::SRP(object_type.into()),
+            32 => Self::Lsp(object_type.into()),
+            33 => Self::Srp(object_type.into()),
             _ => Self::Unknown((object_class, object_type)),
         }
     }
@@ -36,7 +36,7 @@ impl std::fmt::Display for ObjectClassType {
                     write!(f, "(ObjectClassType::Open, OpenObjectType::UnAssigned)")
                 }
             },
-            Self::LSP(lsp_obj_type) => match lsp_obj_type {
+            Self::Lsp(lsp_obj_type) => match lsp_obj_type {
                 LspObjectType::Reserved => {
                     write!(f, "ObjectClassType::LSP, LSPObjectType::Reserved")
                 }
@@ -47,7 +47,7 @@ impl std::fmt::Display for ObjectClassType {
                     write!(f, "ObjectClassType::LSP, LSPObjectType::UnAssigned")
                 }
             },
-            Self::SRP(srp_obj_type) => match srp_obj_type {
+            Self::Srp(srp_obj_type) => match srp_obj_type {
                 SrpObjectType::Reserved => {
                     write!(f, "ObjectClassType::SRP, SRPObjectType::Reserved")
                 }

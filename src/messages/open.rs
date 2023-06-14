@@ -44,7 +44,8 @@ pub mod tests {
     use crate::objects::header::CommonObject;
     use crate::objects::open::OpenObject;
     use crate::objects::types::OpenObjectType;
-    use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, Tlv};
+    use crate::tlvs::tlv_set::{SrPCECapabilityTLV, StatefulPCECapabilityTLV};
+    use crate::tlvs::types::Tlv;
     #[test]
     fn test_open_message_parsing() {
         let input: &[u8] = &[
