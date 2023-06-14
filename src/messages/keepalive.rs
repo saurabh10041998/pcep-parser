@@ -1,6 +1,6 @@
+use crate::messages::header::CommonHeader;
 use colored::Colorize;
 use indoc::writedoc;
-use crate::messages::header::CommonHeader;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct KeepAlive {

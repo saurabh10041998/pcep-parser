@@ -1,17 +1,17 @@
-use nom::{IResult, Err}; 
+use nom::bits;
 use nom::error::{Error, ErrorKind};
 use nom::number;
-use nom::bits;
 use nom::sequence::tuple;
+use nom::{Err, IResult};
 
-use indoc::writedoc;
 use colored::Colorize;
+use indoc::writedoc;
 
 use crate::common::Version;
-use crate::objects::header::CommonObject;
 use crate::objects::classes::ObjectClassType;
+use crate::objects::header::CommonObject;
 use crate::objects::types::OpenObjectType;
-use crate::tlvs::{Tlv, SrPCECapabilityTLV, StatefulPCECapabilityTLV};
+use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, Tlv};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct OpenObject {

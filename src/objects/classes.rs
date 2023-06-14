@@ -1,6 +1,6 @@
+use crate::objects::types::LspObjectType;
 use crate::objects::types::OpenObjectType;
 use crate::objects::types::SrpObjectType;
-use crate::objects::types::LspObjectType;
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum ObjectClassType {
     Open(OpenObjectType),
@@ -39,21 +39,21 @@ impl std::fmt::Display for ObjectClassType {
             Self::LSP(lsp_obj_type) => match lsp_obj_type {
                 LspObjectType::Reserved => {
                     write!(f, "ObjectClassType::LSP, LSPObjectType::Reserved")
-                },
+                }
                 LspObjectType::Lsp => {
                     write!(f, "ObjectClassType::LSP, LSPObjectType::LSP")
-                },
+                }
                 LspObjectType::UnAssigned => {
                     write!(f, "ObjectClassType::LSP, LSPObjectType::UnAssigned")
-                } 
+                }
             },
             Self::SRP(srp_obj_type) => match srp_obj_type {
                 SrpObjectType::Reserved => {
                     write!(f, "ObjectClassType::SRP, SRPObjectType::Reserved")
-                },
+                }
                 SrpObjectType::Srp => {
                     write!(f, "ObjectClassType::SRP, SRPObjectType::SRP")
-                },
+                }
                 SrpObjectType::UnAssigned => {
                     write!(f, "ObjectClassType::SRP, SRPObjectType::UnAssigned")
                 }

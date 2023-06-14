@@ -7,7 +7,6 @@ mod messages;
 mod objects;
 mod tlvs;
 
-
 use messages::header::CommonHeader;
 use messages::keepalive::KeepAlive;
 use messages::open::Open;
@@ -40,7 +39,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let keepalive_msg: KeepAlive = common_header.into();
             println!("[+] Pcep keepalive message..");
             print!("{}", keepalive_msg);
-        },
+        }
         MessageType::PCUpd => {
             println!("[+] Pcep PCupd message");
             unimplemented!();

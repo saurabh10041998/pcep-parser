@@ -33,16 +33,14 @@ impl std::fmt::Display for MessageType {
 // TODO: seperate mod for errors
 #[derive(Debug)]
 pub enum MessageTypeError {
-    UnknownMessageTypeError(u8)
+    UnknownMessageTypeError(u8),
 }
-
 
 impl Default for MessageType {
     fn default() -> Self {
         MessageType::UnKnown(0)
     }
 }
-
 
 impl TryFrom<u8> for MessageType {
     type Error = MessageTypeError;

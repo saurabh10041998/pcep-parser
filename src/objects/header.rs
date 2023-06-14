@@ -1,10 +1,10 @@
-use nom::IResult;
-use nom::number;
+use colored::Colorize;
+use indoc::writedoc;
 use nom::bits;
 use nom::error::Error;
+use nom::number;
 use nom::sequence::tuple;
-use indoc::writedoc;
-use colored::Colorize;
+use nom::IResult;
 
 use crate::objects::classes::ObjectClassType;
 

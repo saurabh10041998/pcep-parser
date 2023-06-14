@@ -17,7 +17,6 @@ impl From<u8> for OpenObjectType {
     }
 }
 
-
 #[non_exhaustive]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum SrpObjectType {

@@ -1,12 +1,11 @@
-use nom::IResult;
+use colored::Colorize;
+use indoc::writedoc;
+use nom::bits;
+use nom::combinator::map_res;
 use nom::error::Error;
 use nom::number;
-use nom::bits;
 use nom::sequence::tuple;
-use nom::combinator::map_res;
-use indoc::writedoc;
-use colored::Colorize;
-
+use nom::IResult;
 
 use crate::common::Version;
 use crate::messages::types::MessageType;
@@ -43,7 +42,8 @@ impl std::fmt::Display for CommonHeader {
 impl CommonHeader {
     pub fn parse_common_header(input: &[u8]) -> IResult<&[u8], Self> {
         let (input, ver_flags) = Self::parse_version_flags(input)?;
-        let (input, message_type): (&[u8], MessageType) = map_res(number::streaming::be_u8, |val| val.try_into() )(input)?;
+        let (input, message_type): (&[u8], MessageType) =
+            map_res(number::streaming::be_u8, |val| val.try_into())(input)?;
         let (input, message_length) = number::streaming::be_u16(input)?;
         //let message_type: MessageType = message_types.try_into().unwrap();
         let header = CommonHeader {
@@ -80,5 +80,4 @@ pub mod tests {
         assert_eq!(common_header, expected);
         assert_eq!(remaing, EMPTY_SLICE);
     }
-
 }

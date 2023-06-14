@@ -1,7 +1,7 @@
-use indoc::writedoc;
-use colored::Colorize;
-use crate::objects::open::OpenObject;
 use crate::messages::header::CommonHeader;
+use crate::objects::open::OpenObject;
+use colored::Colorize;
+use indoc::writedoc;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Open {
@@ -37,14 +37,14 @@ impl std::fmt::Display for Open {
 
 #[cfg(test)]
 pub mod tests {
+    use super::*;
     use crate::common::Version;
-    use crate::objects::header::CommonObject;
-    use crate::objects::open::OpenObject;
-    use crate::tlvs::{Tlv, StatefulPCECapabilityTLV, SrPCECapabilityTLV};
     use crate::messages::types::MessageType;
     use crate::objects::classes::ObjectClassType;
+    use crate::objects::header::CommonObject;
+    use crate::objects::open::OpenObject;
     use crate::objects::types::OpenObjectType;
-    use super::*;
+    use crate::tlvs::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, Tlv};
     #[test]
     fn test_open_message_parsing() {
         let input: &[u8] = &[
@@ -59,7 +59,7 @@ pub mod tests {
 
         let open_message = Open {
             common_header,
-            open_object
+            open_object,
         };
 
         let expected_spc_tlv = StatefulPCECapabilityTLV {
@@ -104,13 +104,12 @@ pub mod tests {
             message_type: MessageType::Open,
             version: Version::One,
             flags: 0,
-            message_length: 36
+            message_length: 36,
         };
         let expected_open_message = Open {
             common_header: expected_ch,
-            open_object: expected_open_object
+            open_object: expected_open_object,
         };
         assert_eq!(open_message, expected_open_message);
     }
-
 }
