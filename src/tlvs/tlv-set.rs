@@ -1,5 +1,6 @@
 use colored::Colorize;
 use indoc::writedoc;
+use nom::bytes;
 use nom::number;
 use nom::IResult;
 
@@ -65,7 +66,7 @@ impl std::fmt::Display for StatefulPCECapabilityTLV {
 #[derive(Debug, PartialEq, Eq, Default)]
 pub struct SrPCECapabilityTLV {
     pub tlv_type: u16,
-    pub tlv_length: u16,
+    pub tlv_len: u16,
     pub reserved: u16,
     pub flag_limit: bool,
     pub max_sid_depth: u8,
@@ -73,14 +74,14 @@ pub struct SrPCECapabilityTLV {
 
 impl SrPCECapabilityTLV {
     pub fn parse_tlv(input: &[u8]) -> IResult<&[u8], Self> {
-        let (remaining, tlv_length) = number::streaming::be_u16(input)?;
+        let (remaining, tlv_len) = number::streaming::be_u16(input)?;
         let (remaining, reserved) = number::streaming::be_u16(remaining)?;
         let (remaining, flags) = number::streaming::be_u8(remaining)?;
         let (remaining, max_sid_depth) = number::streaming::be_u8(remaining)?;
 
         let tlv = SrPCECapabilityTLV {
             tlv_type: 26,
-            tlv_length,
+            tlv_len,
             reserved,
             flag_limit: flags & 0b1 == 0b1,
             max_sid_depth,
@@ -104,10 +105,49 @@ impl std::fmt::Display for SrPCECapabilityTLV {
             "#,
             title = title,
             tlv_type = self.tlv_type,
-            tlv_length = self.tlv_length,
+            tlv_length = self.tlv_len,
             reserved = self.reserved,
             limit = self.flag_limit,
             max_sid_depth = self.max_sid_depth
+        )
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Default)]
+pub struct UnknownTlv {
+    pub tlv_type: u16,
+    pub tlv_len: u16,
+    pub tlv_data: Vec<u8>,
+}
+
+impl UnknownTlv {
+    pub fn parse_tlv(input: &[u8]) -> IResult<&[u8], Self> {
+        let (remaining, tlv_len) = number::streaming::be_u16(input)?;
+        let (remaining, tlv_data) = bytes::streaming::take(tlv_len as usize)(remaining)?;
+        let tlv_data = tlv_data.iter().cloned().collect::<Vec<_>>();
+        let unknown_tlv = UnknownTlv {
+            tlv_type: 0,
+            tlv_len,
+            tlv_data,
+        };
+        Ok((remaining, unknown_tlv))
+    }
+}
+
+impl std::fmt::Display for UnknownTlv {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let title = "[[data]]".bold();
+        writedoc!(
+            f,
+            r#"
+                {title}
+                     tlv_type: {tlv_type}
+                     tlv_len : {tlv_len}
+                     tlv_data: {tlv_data:?}
+            "#,
+            tlv_type = self.tlv_type,
+            tlv_len = self.tlv_len,
+            tlv_data = self.tlv_data
         )
     }
 }

@@ -76,7 +76,7 @@ pub mod tests {
 
         let expected_srpc_tlv = SrPCECapabilityTLV {
             tlv_type: 26,
-            tlv_length: 4,
+            tlv_len: 4,
             reserved: 0,
             flag_limit: false,
             max_sid_depth: 10,

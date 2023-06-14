@@ -11,7 +11,7 @@ use crate::common::Version;
 use crate::objects::classes::ObjectClassType;
 use crate::objects::header::CommonObject;
 use crate::objects::types::OpenObjectType;
-use crate::tlvs::tlv_set::{SrPCECapabilityTLV, StatefulPCECapabilityTLV};
+use crate::tlvs::tlv_parser::Parser;
 use crate::tlvs::types::Tlv;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -33,42 +33,6 @@ impl OpenObject {
         )))(input)
     }
 
-    fn parse_open_object_tlv(input: &[u8]) -> IResult<&[u8], Tlv> {
-        let (remaining, tlv_type) = number::streaming::be_u16(input)?;
-        match tlv_type.into() {
-            Tlv::StatefulPCECapability(_) => {
-                // parse StatefulPCETLV
-                let (remaining, tlv) = StatefulPCECapabilityTLV::parse_tlv(remaining)?;
-                Ok((remaining, Tlv::StatefulPCECapability(tlv)))
-            }
-            Tlv::SrPCECapability(_) => {
-                //parse SRPCECapabilityTLV
-                let (remaining, tlv) = SrPCECapabilityTLV::parse_tlv(remaining)?;
-                Ok((remaining, Tlv::SrPCECapability(tlv)))
-            }
-            Tlv::Unknown(val) => Ok((remaining, Tlv::Unknown(val))),
-        }
-    }
-
-    fn parse_open_object_tlvs(input: &[u8]) -> IResult<&[u8], Vec<Tlv>> {
-        let mut left = input;
-        let mut tlvs = vec![];
-        while left.first().is_some() {
-            match Self::parse_open_object_tlv(left) {
-                Ok((remaining, tlv)) => {
-                    if let Tlv::Unknown(_) = tlv {
-                        //TODO : skip to the next tlv if this tlv is not parsable..
-                        break;
-                    }
-                    tlvs.push(tlv);
-                    left = remaining;
-                }
-                Err(e) => return Err(e),
-            }
-        }
-        Ok((&[], tlvs))
-    }
-
     pub fn parse_open_object(input: &[u8]) -> IResult<&[u8], OpenObject> {
         let (remaining, cobj) = CommonObject::parse_common_object(input)?;
         if let ObjectClassType::Open(OpenObjectType::Open) = cobj.object_class_type {
@@ -87,7 +51,7 @@ impl OpenObject {
             };
             if !remaining.is_empty() {
                 // TLV section..
-                let (remaining, tlvs) = Self::parse_open_object_tlvs(remaining)?;
+                let (remaining, tlvs) = Parser::parse_tlvs(remaining)?;
                 open_obj.tlvs = Some(tlvs);
                 return Ok((remaining, open_obj));
             }

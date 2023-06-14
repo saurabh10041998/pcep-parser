@@ -1,4 +1,4 @@
-use crate::tlvs::tlv_set::{SrPCECapabilityTLV, StatefulPCECapabilityTLV};
+use crate::tlvs::tlv_set::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, UnknownTlv};
 use colored::Colorize;
 use indoc::writedoc;
 
@@ -7,7 +7,7 @@ use indoc::writedoc;
 pub enum Tlv {
     StatefulPCECapability(StatefulPCECapabilityTLV),
     SrPCECapability(SrPCECapabilityTLV),
-    Unknown(u16),
+    Unknown(UnknownTlv),
 }
 
 impl From<u16> for Tlv {
@@ -15,7 +15,7 @@ impl From<u16> for Tlv {
         match value {
             16 => Self::StatefulPCECapability(Default::default()),
             26 => Self::SrPCECapability(Default::default()),
-            _ => Self::Unknown(value),
+            _ => Self::Unknown(Default::default()),
         }
     }
 }
@@ -52,7 +52,18 @@ impl std::fmt::Display for Tlv {
                 )
             }
             Self::Unknown(x) => {
-                unimplemented!("[!!] Not sure how to print TLV of type: {}", *x);
+                let title = "==[UNKNOWN TLV]==".green().bold();
+                writedoc!(
+                    f,
+                    r#"
+                    {:indent$}{title}
+                        {tlv}
+                    "#,
+                    "",
+                    title = title,
+                    tlv = x,
+                    indent = 4
+                )
             }
         }
     }
