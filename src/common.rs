@@ -20,3 +20,9 @@ impl From<u8> for Version {
         }
     }
 }
+
+impl Default for Version {
+    fn default() -> Self {
+        Self::One
+    }
+}
