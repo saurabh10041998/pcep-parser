@@ -2,6 +2,15 @@
 # pcep-parser
 Crate aiming for making parsing of PCEP protocol messages.
 
+## message type supported
+- [x] OPEN message
+- [x] Keepalive message
+- [ ] PCUpdate message
+- [ ] PCInitiate message. 
+
 ## todo
-- [x] Fix cicd errors due to TLV adding in open message.
-- [x] Fix clippy errors.
+- [ ] Fix cicd errors due to TLV adding in open message.
+- [ ] Fix clippy errors.
+- [ ] LSP Objects and it's Tlvs
+- [ ] Path Object and it's Tlvs
+- [ ] PcUpdate message
