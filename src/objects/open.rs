@@ -1,4 +1,5 @@
 use nom::bits;
+use nom::bytes;
 use nom::error::{Error, ErrorKind};
 use nom::number;
 use nom::sequence::tuple;
@@ -36,10 +37,13 @@ impl OpenObject {
     pub fn parse_open_object(input: &[u8]) -> IResult<&[u8], OpenObject> {
         let (remaining, cobj) = CommonObject::parse_common_object(input)?;
         if let ObjectClassType::Open(OpenObjectType::Open) = cobj.object_class_type {
-            let (remaining, ver_flags) = Self::parse_ver_flags(remaining)?;
-            let (remaining, keepalive) = number::streaming::be_u8(remaining)?;
-            let (remaining, deadtimer) = number::streaming::be_u8(remaining)?;
-            let (remaining, sid) = number::streaming::be_u8(remaining)?;
+            let object_body_len = cobj.object_length - 4;
+            let (remaining, object_body) =
+                bytes::streaming::take(object_body_len as usize)(remaining)?;
+            let (object_body, ver_flags) = Self::parse_ver_flags(object_body)?;
+            let (object_body, keepalive) = number::streaming::be_u8(object_body)?;
+            let (object_body, deadtimer) = number::streaming::be_u8(object_body)?;
+            let (object_body, sid) = number::streaming::be_u8(object_body)?;
             let mut open_obj = OpenObject {
                 common_object: cobj,
                 version: ver_flags.0.into(),
@@ -49,11 +53,12 @@ impl OpenObject {
                 sid,
                 tlvs: None,
             };
-            if !remaining.is_empty() {
+            if !object_body.is_empty() {
                 // TLV section..
-                let (remaining, tlvs) = Parser::parse_tlvs(remaining)?;
+                let (object_body, tlvs) = Parser::parse_tlvs(object_body)?;
+                // Did nom eat all the object ??
+                assert!(object_body.is_empty());
                 open_obj.tlvs = Some(tlvs);
-                return Ok((remaining, open_obj));
             }
             return Ok((remaining, open_obj));
         }
