@@ -1,4 +1,7 @@
-use crate::tlvs::tlv_set::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, UnknownTlv};
+use crate::tlvs::tlv_set::{
+    Ipv4LSPIndetifiersTLV, SrPCECapabilityTLV, StatefulPCECapabilityTLV, SymbolicPathNameTLV,
+    UnknownTLV,
+};
 use colored::Colorize;
 use indoc::writedoc;
 
@@ -7,13 +10,17 @@ use indoc::writedoc;
 pub enum Tlv {
     StatefulPCECapability(StatefulPCECapabilityTLV),
     SrPCECapability(SrPCECapabilityTLV),
-    Unknown(UnknownTlv),
+    SymbolicPathName(SymbolicPathNameTLV),
+    Ipv4LSPIndetifiers(Ipv4LSPIndetifiersTLV),
+    Unknown(UnknownTLV),
 }
 
 impl From<u16> for Tlv {
     fn from(value: u16) -> Self {
         match value {
             16 => Self::StatefulPCECapability(Default::default()),
+            17 => Self::SymbolicPathName(Default::default()),
+            18 => Self::Ipv4LSPIndetifiers(Default::default()),
             26 => Self::SrPCECapability(Default::default()),
             _ => Self::Unknown(Default::default()),
         }
@@ -48,6 +55,34 @@ impl std::fmt::Display for Tlv {
                     "",
                     title = title,
                     tlv = srpc,
+                    indent = 4
+                )
+            }
+            Self::SymbolicPathName(spn) => {
+                let title = "==[SYMBOLIC-PATH-NAME TLV]==".green().bold();
+                writedoc!(
+                    f,
+                    r#"
+                    {:indent$}{title}
+                        {tlv}
+                    "#,
+                    "",
+                    title = title,
+                    tlv = spn,
+                    indent = 4
+                )
+            }
+            Self::Ipv4LSPIndetifiers(ipv4lspi) => {
+                let title = "==[IPV4-LSP-IDENTIFIERS TLV]==".green().bold();
+                writedoc!(
+                    f,
+                    r#"
+                    {:indent$}{title}
+                        {tlv}
+                    "#,
+                    "",
+                    title = title,
+                    tlv = ipv4lspi,
                     indent = 4
                 )
             }

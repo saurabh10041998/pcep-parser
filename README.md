@@ -9,8 +9,8 @@ Crate aiming for making parsing of PCEP protocol messages.
 - [ ] PCInitiate message. 
 
 ## todo
-- [ ] Fix cicd errors due to TLV adding in open message.
+- [x] Fix cicd errors due to TLV adding in open message.
 - [ ] Fix clippy errors.
-- [ ] LSP Objects and it's Tlvs
+- [x] LSP Objects and it's Tlvs
 - [ ] Path Object and it's Tlvs
 - [ ] PcUpdate message

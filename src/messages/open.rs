@@ -44,7 +44,7 @@ pub mod tests {
     use crate::objects::header::CommonObject;
     use crate::objects::open::OpenObject;
     use crate::objects::types::OpenObjectType;
-    use crate::tlvs::tlv_set::{SrPCECapabilityTLV, StatefulPCECapabilityTLV};
+    use crate::tlvs::tlv_set::{SrPCECapabilityTLV, StatefulPCECapabilityTLV, UnknownTLV};
     use crate::tlvs::types::Tlv;
     #[test]
     fn test_open_message_parsing() {
@@ -82,6 +82,12 @@ pub mod tests {
             max_sid_depth: 10,
         };
 
+        // TODO: Code to parse this Tlv
+        let unknown_tlv = UnknownTLV {
+            tlv_type: 35,
+            tlv_len: 2,
+            tlv_data: vec![0x00, 0x14],
+        };
         let expected_open_object = OpenObject {
             common_object: CommonObject {
                 object_class_type: ObjectClassType::Open(OpenObjectType::Open),
@@ -98,6 +104,7 @@ pub mod tests {
             tlvs: Some(vec![
                 Tlv::StatefulPCECapability(expected_spc_tlv),
                 Tlv::SrPCECapability(expected_srpc_tlv),
+                Tlv::Unknown(unknown_tlv),
             ]),
         };
 

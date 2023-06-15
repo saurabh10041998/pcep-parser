@@ -46,6 +46,8 @@ impl SrpObject {
 #[cfg(test)]
 pub mod tests {
     use super::*;
+    use crate::tlvs::tlv_set::UnknownTLV;
+    use crate::tlvs::types::Tlv;
     #[test]
     fn test_srp_object_parsing() {
         let input: &[u8] = &[
@@ -62,11 +64,17 @@ pub mod tests {
             flag_ignore: false,
             object_length: 20,
         };
+        // TODO : code to parse this TLVs
+        let unknown_tlv = UnknownTLV {
+            tlv_type: 28,
+            tlv_len: 4,
+            tlv_data: vec![0x00, 0x00, 0x00, 0x01],
+        };
         let expected_srp_obj = SrpObject {
             common_object: expected_cobj,
             flags: 0,
             srp_id: 1,
-            tlvs: None,
+            tlvs: Some(vec![Tlv::Unknown(unknown_tlv)]),
         };
         assert_eq!(srp_object, expected_srp_obj);
     }

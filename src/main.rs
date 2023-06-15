@@ -24,7 +24,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Err(e) => panic!("{:?}", e),
     };
 
-    println!("{}", common_header);
+    //println!("{}", common_header);
     match common_header.message_type {
         MessageType::Open => {
             println!("[+] Pcep Open message..");
