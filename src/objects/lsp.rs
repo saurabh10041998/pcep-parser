@@ -26,6 +26,8 @@ pub struct LspObject {
     pub tlvs: Option<Vec<Tlv>>,
 }
 
+type PlspIdResOperFlagsARSDTuple  = (u32, u8, u8, u8, u8, u8, u8);
+
 impl LspObject {
     // Parse
     // plsp-id : 20 bits
@@ -38,7 +40,7 @@ impl LspObject {
     // d flag : 1 bit
     fn parse_plsp_id_res_oper_flag_a_r_s_d(
         input: &[u8],
-    ) -> IResult<&[u8], (u32, u8, u8, u8, u8, u8, u8)> {
+    ) -> IResult<&[u8], PlspIdResOperFlagsARSDTuple> {
         bits::bits::<_, _, Error<_>, _, _>(tuple((
             bits::streaming::take(20u32),
             bits::streaming::take(5u8),

@@ -233,7 +233,7 @@ impl Ipv4LSPIndetifiersTLV {
         let (remaining, tunnel_id) = number::streaming::be_u16(remaining)?;
         let (remaining, extended_tunnel_id) = number::streaming::be_u32(remaining)?;
         let (remaining, endpoint_ipv4_octets): (&[u8], [u8; 4]) =
-            map_res(bytes::streaming::take(4 as usize), |f: &[u8]| f.try_into())(remaining)?;
+            map_res(bytes::streaming::take(4usize), |f: &[u8]| f.try_into())(remaining)?;
 
         let tlv = Ipv4LSPIndetifiersTLV {
             tlv_type: 18,
