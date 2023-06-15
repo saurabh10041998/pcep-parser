@@ -26,7 +26,7 @@ pub struct LspObject {
     pub tlvs: Option<Vec<Tlv>>,
 }
 
-type PlspIdResOperFlagsARSDTuple  = (u32, u8, u8, u8, u8, u8, u8);
+type PlspIdResOperFlagsARSDTuple = (u32, u8, u8, u8, u8, u8, u8);
 
 impl LspObject {
     // Parse
