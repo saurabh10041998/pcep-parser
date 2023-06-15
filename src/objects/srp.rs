@@ -1,3 +1,5 @@
+use colored::Colorize;
+use indoc::writedoc;
 use nom::bytes;
 use nom::error::{Error, ErrorKind};
 use nom::number;
@@ -40,6 +42,34 @@ impl SrpObject {
             return Ok((remaining, srp_object));
         }
         Err(Err::Failure(Error::new(input, ErrorKind::Fail)))
+    }
+}
+
+impl std::fmt::Display for SrpObject {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut tlvs_str = String::new();
+        if let Some(ref tlvs) = self.tlvs {
+            for t in tlvs {
+                let output = format!("{}", t);
+                tlvs_str.push_str(&output)
+            }
+        }
+        let title = "==[SRP Object]==".green().bold();
+        writedoc!(
+            f,
+            r#"
+            {title}
+                {common_object}
+                flags                  = {flags}
+                srp_id                 = {srp_id}
+            {tlv_str}
+            "#,
+            title = title,
+            common_object = self.common_object,
+            flags = self.flags,
+            srp_id = self.srp_id,
+            tlv_str = tlvs_str
+        )
     }
 }
 

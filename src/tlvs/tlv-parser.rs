@@ -16,7 +16,7 @@ impl Parser {
         match Utils::consume_padding(len, input) {
             Ok((remaining, padding)) => Ok((remaining, padding)),
             Err(Err::Incomplete(_x)) => Ok((input, &[])),
-            Err(e) => return Err(e),
+            Err(e) => Err(e),
         }
     }
     pub fn parse_tlv(input: &[u8]) -> IResult<&[u8], Tlv> {

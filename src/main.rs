@@ -11,6 +11,7 @@ mod tlvs;
 use messages::header::CommonHeader;
 use messages::keepalive::KeepAlive;
 use messages::open::Open;
+use messages::pcupdate::PcepUpdate;
 use messages::types::MessageType;
 use objects::open::OpenObject;
 
@@ -41,18 +42,16 @@ fn main() -> Result<(), Box<dyn Error>> {
             println!("[+] Pcep keepalive message..");
             print!("{}", keepalive_msg);
         }
-        MessageType::PCUpd => {
-            println!("[+] Pcep PCupd message");
-            unimplemented!();
-            // match PcepUpdate::parse_update_message(remaining) {
-            //     Ok((_remaining, mut pcupd)) => {
-            //         pcupd.set_common_header(common_header);
-            //     },
-            //     Err(e) => {
-            //         panic!("{:?}",e);
-            //     }
-            // }
-        }
+        MessageType::PCUpd => match PcepUpdate::parse_update_message(remaining) {
+            Ok((_remaining, mut update_message)) => {
+                println!("[+] Pcep PCupdate message");
+                update_message.common_header = common_header;
+                print!("{}", update_message);
+            }
+            Err(e) => {
+                panic!("{:#?}", e);
+            }
+        },
         _ => {
             println!("[!!]Unknown message type detected");
         }

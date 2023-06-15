@@ -1,7 +1,8 @@
+use colored::Colorize;
+use indoc::writedoc;
 use nom::bits;
 use nom::bytes;
 use nom::error::{Error, ErrorKind};
-use nom::number;
 use nom::sequence::tuple;
 use nom::{Err, IResult};
 
@@ -74,6 +75,43 @@ impl LspObject {
             return Ok((remaining, lsp_object));
         }
         Err(Err::Failure(Error::new(input, ErrorKind::Fail)))
+    }
+}
+
+impl std::fmt::Display for LspObject {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut tlvs_str = String::new();
+        if let Some(ref tlvs) = self.tlvs {
+            for t in tlvs {
+                let output = format!("{}", t);
+                tlvs_str.push_str(&output)
+            }
+        }
+        let title = "==[LSP Object]==".green().bold();
+        writedoc!(
+            f,
+            r#"
+            {title}
+                {common_object}
+                plsp_id                      = {plsp_id}
+                operational_status           = {operational_status}
+                flag_administrative          = {flag_administrative}
+                flag_remove                  = {flag_remove}
+                flag_sync                    = {flag_sync}
+                flag_delegate                = {flag_delegate}
+
+            {tlv_str}
+            "#,
+            title = title,
+            common_object = self.common_object,
+            plsp_id = self.plsp_id,
+            operational_status = self.operational_status,
+            flag_administrative = self.flag_administrative,
+            flag_remove = self.flag_remove,
+            flag_sync = self.flag_sync,
+            flag_delegate = self.flag_delegate,
+            tlv_str = tlvs_str
+        )
     }
 }
 

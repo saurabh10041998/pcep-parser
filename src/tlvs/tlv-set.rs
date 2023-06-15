@@ -126,7 +126,7 @@ impl UnknownTLV {
     pub fn parse_tlv(input: &[u8]) -> IResult<&[u8], Self> {
         let (remaining, tlv_len) = number::streaming::be_u16(input)?;
         let (remaining, tlv_data) = bytes::streaming::take(tlv_len as usize)(remaining)?;
-        let tlv_data = tlv_data.iter().cloned().collect::<Vec<_>>();
+        let tlv_data = tlv_data.to_vec();
         let unknown_tlv = UnknownTLV {
             tlv_type: 0,
             tlv_len,
