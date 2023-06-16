@@ -1,6 +1,7 @@
 use crate::objects::types::BandwidthObjectType;
 use crate::objects::types::LspObjectType;
 use crate::objects::types::LspaObjectType;
+use crate::objects::types::MetricObjectType;
 use crate::objects::types::OpenObjectType;
 use crate::objects::types::SrpObjectType;
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -10,6 +11,7 @@ pub enum ObjectClassType {
     Lspa(LspaObjectType),
     Srp(SrpObjectType),
     Bandwidth(BandwidthObjectType),
+    Metric(MetricObjectType),
     Unknown((u8, u8)),
 }
 
@@ -20,6 +22,7 @@ impl From<(u8, u8)> for ObjectClassType {
         match object_class {
             1 => Self::Open(object_type.into()),
             5 => Self::Bandwidth(object_type.into()),
+            6 => Self::Metric(object_type.into()),
             9 => Self::Lspa(object_type.into()),
             32 => Self::Lsp(object_type.into()),
             33 => Self::Srp(object_type.into()),
@@ -78,6 +81,17 @@ impl std::fmt::Display for ObjectClassType {
                         f,
                         "(ObjectClassType::Bandwidth, BandwidthObjectType::UnAssigned)"
                     )
+                }
+            },
+            Self::Metric(metric_obj_type) => match metric_obj_type {
+                MetricObjectType::Reserved => {
+                    write!(f, "(ObjectClassType::Metric, LspaObjectType::Reserved)")
+                }
+                MetricObjectType::Metric => {
+                    write!(f, "(ObjectClassType::Metric, LspaObjectType::Metric)")
+                }
+                MetricObjectType::Unassigned => {
+                    write!(f, "(ObjectClassType::Metric, LspaObjectType::Unassigned)")
                 }
             },
             Self::Lspa(lspa_obj_type) => match lspa_obj_type {

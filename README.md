@@ -16,6 +16,6 @@ Crate aiming for making parsing of PCEP protocol messages.
 - [ ] path attribute list
 - [x] LSPA object. (Done except TLVs)
 - [x] BANDWIDTH object
-- [ ] METRIC object
+- [x] METRIC object. (Add metric types)
 - [ ] IRO object. 
 - [ ] PcUpdate message

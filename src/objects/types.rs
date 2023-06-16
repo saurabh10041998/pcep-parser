@@ -97,3 +97,22 @@ impl From<u8> for LspaObjectType {
         }
     }
 }
+
+#[non_exhaustive]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum MetricObjectType {
+    Reserved,
+    Metric,
+    Unassigned,
+}
+
+impl From<u8> for MetricObjectType {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => Self::Reserved,
+            1 => Self::Metric,
+            2..=15 => Self::Unassigned,
+            _ => panic!("[!!] Invalid Object type value for METRIC object"),
+        }
+    }
+}
