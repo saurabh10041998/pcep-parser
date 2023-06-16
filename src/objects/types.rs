@@ -54,3 +54,28 @@ impl From<u8> for LspObjectType {
         }
     }
 }
+
+#[non_exhaustive]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum BandwidthObjectType {
+    Reserved,
+    Requested,
+    RequestedOpt,
+    Genric,
+    GenericOpt,
+    UnAssigned,
+}
+
+impl From<u8> for BandwidthObjectType {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => Self::Reserved,
+            1 => Self::Requested,
+            2 => Self::RequestedOpt,
+            3 => Self::Genric,
+            4 => Self::GenericOpt,
+            5..=15 => Self::UnAssigned,
+            _ => panic!("[!!] Invalid Object type value for Bandwidth object"),
+        }
+    }
+}

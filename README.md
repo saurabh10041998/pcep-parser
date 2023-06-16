@@ -13,4 +13,9 @@ Crate aiming for making parsing of PCEP protocol messages.
 - [ ] Fix clippy errors.
 - [x] LSP Objects and it's Tlvs
 - [ ] Path Object and it's Tlvs
+- [ ] path attribute list
+- [ ] LSPA object
+- [x] BANDWIDTH object
+- [ ] METRIC object
+- [ ] IRO object. 
 - [ ] PcUpdate message

@@ -1,3 +1,4 @@
+use crate::objects::types::BandwidthObjectType;
 use crate::objects::types::LspObjectType;
 use crate::objects::types::OpenObjectType;
 use crate::objects::types::SrpObjectType;
@@ -6,6 +7,7 @@ pub enum ObjectClassType {
     Open(OpenObjectType),
     Lsp(LspObjectType),
     Srp(SrpObjectType),
+    Bandwidth(BandwidthObjectType),
     Unknown((u8, u8)),
 }
 
@@ -15,6 +17,7 @@ impl From<(u8, u8)> for ObjectClassType {
         let object_type = value.1;
         match object_class {
             1 => Self::Open(object_type.into()),
+            5 => Self::Bandwidth(object_type.into()),
             32 => Self::Lsp(object_type.into()),
             33 => Self::Srp(object_type.into()),
             _ => Self::Unknown((object_class, object_type)),
@@ -36,26 +39,64 @@ impl std::fmt::Display for ObjectClassType {
                     write!(f, "(ObjectClassType::Open, OpenObjectType::UnAssigned)")
                 }
             },
+            Self::Bandwidth(bandwidth_obj_type) => match bandwidth_obj_type {
+                BandwidthObjectType::Reserved => {
+                    write!(
+                        f,
+                        "(ObjectClassType::Bandwidth, BandwidthObjectType::Reserved)"
+                    )
+                }
+                BandwidthObjectType::Requested => {
+                    write!(
+                        f,
+                        "(ObjectClassType::Bandwidth, BandwidthObjectType::REQUESTED)"
+                    )
+                }
+                BandwidthObjectType::RequestedOpt => {
+                    write!(
+                        f,
+                        "(ObjectClassType::Bandwidth, BandwidthObjectType::REQUESTED_OPT)"
+                    )
+                }
+                BandwidthObjectType::Genric => {
+                    write!(
+                        f,
+                        "(ObjectClassType::Bandwidth, BandwidthObjectType::GENERIC)"
+                    )
+                }
+                BandwidthObjectType::GenericOpt => {
+                    write!(
+                        f,
+                        "(ObjectClassType::Bandwidth, BandwidthObjectType::GENERIC_OPT)"
+                    )
+                }
+                BandwidthObjectType::UnAssigned => {
+                    write!(
+                        f,
+                        "(ObjectClassType::Bandwidth, BandwidthObjectType::UnAssigned)"
+                    )
+                }
+            },
             Self::Lsp(lsp_obj_type) => match lsp_obj_type {
                 LspObjectType::Reserved => {
-                    write!(f, "ObjectClassType::LSP, LSPObjectType::Reserved")
+                    write!(f, "(ObjectClassType::LSP, LSPObjectType::Reserved)")
                 }
                 LspObjectType::Lsp => {
-                    write!(f, "ObjectClassType::LSP, LSPObjectType::LSP")
+                    write!(f, "(ObjectClassType::LSP, LSPObjectType::LSP)")
                 }
                 LspObjectType::UnAssigned => {
-                    write!(f, "ObjectClassType::LSP, LSPObjectType::UnAssigned")
+                    write!(f, "(ObjectClassType::LSP, LSPObjectType::UnAssigned)")
                 }
             },
             Self::Srp(srp_obj_type) => match srp_obj_type {
                 SrpObjectType::Reserved => {
-                    write!(f, "ObjectClassType::SRP, SRPObjectType::Reserved")
+                    write!(f, "(ObjectClassType::SRP, SRPObjectType::Reserved")
                 }
                 SrpObjectType::Srp => {
-                    write!(f, "ObjectClassType::SRP, SRPObjectType::SRP")
+                    write!(f, "(ObjectClassType::SRP, SRPObjectType::SRP)")
                 }
                 SrpObjectType::UnAssigned => {
-                    write!(f, "ObjectClassType::SRP, SRPObjectType::UnAssigned")
+                    write!(f, "(ObjectClassType::SRP, SRPObjectType::UnAssigned)")
                 }
             },
             Self::Unknown(x) => {
