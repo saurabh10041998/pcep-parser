@@ -1,11 +1,13 @@
 use crate::objects::types::BandwidthObjectType;
 use crate::objects::types::LspObjectType;
+use crate::objects::types::LspaObjectType;
 use crate::objects::types::OpenObjectType;
 use crate::objects::types::SrpObjectType;
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum ObjectClassType {
     Open(OpenObjectType),
     Lsp(LspObjectType),
+    Lspa(LspaObjectType),
     Srp(SrpObjectType),
     Bandwidth(BandwidthObjectType),
     Unknown((u8, u8)),
@@ -18,6 +20,7 @@ impl From<(u8, u8)> for ObjectClassType {
         match object_class {
             1 => Self::Open(object_type.into()),
             5 => Self::Bandwidth(object_type.into()),
+            9 => Self::Lspa(object_type.into()),
             32 => Self::Lsp(object_type.into()),
             33 => Self::Srp(object_type.into()),
             _ => Self::Unknown((object_class, object_type)),
@@ -75,6 +78,17 @@ impl std::fmt::Display for ObjectClassType {
                         f,
                         "(ObjectClassType::Bandwidth, BandwidthObjectType::UnAssigned)"
                     )
+                }
+            },
+            Self::Lspa(lspa_obj_type) => match lspa_obj_type {
+                LspaObjectType::Reserved => {
+                    write!(f, "(ObjectClassType::Lspa, LspaObjectType::Reserved)")
+                }
+                LspaObjectType::Lspa => {
+                    write!(f, "(ObjectClassType::Lspa, LspaObjectType::LSPA)")
+                }
+                LspaObjectType::Unassigned => {
+                    write!(f, "(ObjectClassType::Lspa, LspaObjectType::Unassigned)")
                 }
             },
             Self::Lsp(lsp_obj_type) => match lsp_obj_type {

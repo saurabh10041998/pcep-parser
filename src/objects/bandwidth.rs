@@ -1,3 +1,5 @@
+use colored::Colorize;
+use indoc::writedoc;
 use nom::bytes;
 use nom::error::{Error, ErrorKind};
 use nom::number;
@@ -18,7 +20,7 @@ impl PartialEq for BandwidthObject {
         let t1 = self.common_object.eq(&other.common_object);
         // TODO: Use strong float comparsion heuristics.
         let t2 = (other.bandwidth - self.bandwidth) as u32 == 0;
-        return t1 && t2;
+        t1 && t2
     }
 }
 
@@ -47,6 +49,22 @@ impl BandwidthObject {
     }
 }
 
+impl std::fmt::Display for BandwidthObject {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let title = "==[BANDWIDTH Object]==".green().bold();
+        writedoc!(
+            f,
+            r#"
+            {title}
+                {common_object}
+                bandwidth: {bandwidth}
+            "#,
+            title = title,
+            common_object = self.common_object,
+            bandwidth = self.bandwidth
+        )
+    }
+}
 #[cfg(test)]
 pub mod tests {
     use super::*;

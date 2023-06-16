@@ -79,3 +79,21 @@ impl From<u8> for BandwidthObjectType {
         }
     }
 }
+#[non_exhaustive]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum LspaObjectType {
+    Reserved,
+    Lspa,
+    Unassigned,
+}
+
+impl From<u8> for LspaObjectType {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => Self::Reserved,
+            1 => Self::Lspa,
+            2..=15 => Self::Unassigned,
+            _ => panic!("[!!] Invalid Object type value for LSPA object"),
+        }
+    }
+}
