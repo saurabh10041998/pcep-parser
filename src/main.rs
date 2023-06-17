@@ -5,6 +5,7 @@ use std::io::Read;
 mod common;
 mod messages;
 mod objects;
+mod subobjects;
 //mod tlvs;
 mod tlvs;
 

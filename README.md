@@ -5,17 +5,18 @@ Crate aiming for making parsing of PCEP protocol messages.
 ## message type supported
 - [x] OPEN message
 - [x] Keepalive message
-- [ ] PCUpdate message
+- [x] PCUpdate message. (Not all field are supported, Document the gap)
 - [ ] PCInitiate message. 
 
 ## todo
 - [x] Fix cicd errors due to TLV adding in open message.
 - [ ] Fix clippy errors.
 - [x] LSP Objects and it's Tlvs
-- [ ] Path Object and it's Tlvs
-- [ ] path attribute list
+- [x] Path Object and it's Tlvs
+- [x] path attribute list
 - [x] LSPA object. (Done except TLVs)
 - [x] BANDWIDTH object
 - [x] METRIC object. (Add metric types)
 - [ ] IRO object. 
-- [ ] PcUpdate message
+- [x] PcUpdate message
+- [ ] Document gap for PcUpdate message.
