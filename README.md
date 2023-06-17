@@ -10,7 +10,7 @@ Crate aiming for making parsing of PCEP protocol messages.
 
 ## todo
 - [x] Fix cicd errors due to TLV adding in open message.
-- [ ] Fix clippy errors.
+- [x] Fix clippy errors.
 - [x] LSP Objects and it's Tlvs
 - [x] Path Object and it's Tlvs
 - [x] path attribute list

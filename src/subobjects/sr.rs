@@ -56,7 +56,7 @@ impl Ipv4AdjNAI {
             local_ipv4: local_ipv4.into(),
             remote_ipv4: remote_ipv4.into(),
         };
-        return Ok((remaining, ipv4_adj_nai));
+        Ok((remaining, ipv4_adj_nai))
     }
 }
 
@@ -145,7 +145,7 @@ impl std::fmt::Display for SrSubobject {
                      flag_c     = {flag_c}
                      flag_m     = {flag_m}
                      sid        = {sid}
-                     
+
                      {nai_type}
             "#,
             flag_f = self.flag_f,
