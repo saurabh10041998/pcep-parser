@@ -1,0 +1,138 @@
+name: Continuous Deployment
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  create-github-release:
+    name: create-github-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create artifacts directory
+        run: mkdir artifacts
+
+      - name: Get the release version from the tag
+        if: env.VERSION == ''
+        run: |
+          if [[ -n "${{ github.event.inputs.tag }}" ]]; then
+            echo "Manual run against a tag; overriding actual tag in the environment..."
+            echo "VERSION=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          fi
+
+      - name: Validate version environment variable
+        run: |
+          echo "Version being built against is version ${{ env.VERSION }}"!
+
+      - name: Save version number to artifact
+        run: echo "${{ env.VERSION }}" > artifacts/release-version
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: artifacts
+          path: artifacts
+
+  build-release:
+    name: build-release
+    needs: [create-github-release]
+    runs-on: ${{ matrix.job.os }}
+    env:
+      RUST_BACKTRACE: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [stable]
+        job:
+          - { os: "macOS-latest",   target: "x86_64-apple-darwin",          artifact_prefix: "macos"   }
+          - { os: "windows-latest", target: "x86_64-pc-windows-msvc",       artifact_prefix: "windows" }
+          - { os: "ubuntu-latest",  target: "x86_64-unknown-linux-gnu",     artifact_prefix: "linux"   }
+          - { os: "ubuntu-latest",  target: "x86_64-unknown-linux-musl",    artifact_prefix: "linux-musl"}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Get shared artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts
+
+      - name: Set release version
+        shell: bash
+        run: |
+          release_version="$(cat ./artifacts/release-version)"
+          echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
+
+      - name: Validate release environment variables
+        run: |
+          echo "Release version: ${{ env.RELEASE_VERSION }}"
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
+          target: ${{ matrix.job.target }}
+          profile: minimal # minimal component installation (ie, no documentation)
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --verbose --target=${{ matrix.job.target }}
+          toolchain: ${{ matrix.rust }}
+
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --target=${{ matrix.job.target }} ${{ matrix.job.test-bin }}
+
+      - name: Packaging final binary (Windows)
+        if: matrix.job.os == 'windows-latest'
+        shell: bash
+        run: |
+          BINARY_NAME=pcep-parser.exe
+          cd target/${{ matrix.job.target }}/release
+          RELEASE_NAME=pcep-parser-${{ matrix.job.artifact_prefix }}
+          tar czvf $RELEASE_NAME.tar.gz $BINARY_NAME
+          # create sha checksum files
+          certutil -hashfile $RELEASE_NAME.tar.gz sha256 | grep -E [A-Fa-f0-9]{64} > $RELEASE_NAME.sha256
+          echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
+
+      - name: Packaging final binary (macOS and Linux)
+        if: matrix.job.os != 'windows-latest'
+        shell: bash
+        run: |
+          BINARY_NAME=pcep-parser
+          cd target/${{ matrix.job.target }}/release
+          RELEASE_NAME=pcep-parser-${{ matrix.job.artifact_prefix }}
+          tar czvf $RELEASE_NAME.tar.gz $BINARY_NAME
+          # create sha checksum files
+          shasum -a 256 $RELEASE_NAME.tar.gz > $RELEASE_NAME.sha256
+          echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
+
+      - name: Releasing assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            target/${{ matrix.job.target }}/release/${{ env.RELEASE_NAME }}.tar.gz
+            target/${{ matrix.job.target }}/release/${{ env.RELEASE_NAME }}.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add SHA to artifacts
+        run: |
+          cp target/${{ matrix.job.target }}/release/${{ env.RELEASE_NAME }}.sha256 artifacts/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: artifacts
+          path: artifacts
