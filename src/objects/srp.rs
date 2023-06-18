@@ -1,8 +1,10 @@
 use colored::Colorize;
 use indoc::writedoc;
+use nom::bits;
 use nom::bytes;
 use nom::error::{Error, ErrorKind};
 use nom::number;
+use nom::sequence::tuple;
 use nom::{Err, IResult};
 
 use crate::objects::header::CommonObject;
@@ -16,22 +18,30 @@ use super::types::SrpObjectType;
 pub struct SrpObject {
     pub common_object: CommonObject,
     pub flags: u32,
+    pub flag_remove: bool,
     pub srp_id: u32,
     pub tlvs: Option<Vec<Tlv>>,
 }
 
 impl SrpObject {
+    pub fn parse_flag_r(input: &[u8]) -> IResult<&[u8], (u32, u8)> {
+        bits::bits::<_, _, Error<_>, _, _>(tuple((
+            bits::streaming::take(31u32),
+            bits::streaming::take(1u8),
+        )))(input)
+    }
     pub fn parse_srp_object(input: &[u8]) -> IResult<&[u8], Self> {
         let (remaining, common_object) = CommonObject::parse_common_object(input)?;
         if let ObjectClassType::Srp(SrpObjectType::Srp) = common_object.object_class_type {
             let object_body_len = common_object.object_length - 4;
             let (remaining, object_body) =
                 bytes::streaming::take(object_body_len as usize)(remaining)?;
-            let (object_body, flags) = number::streaming::be_u32(object_body)?;
+            let (object_body, flag_r) = Self::parse_flag_r(object_body)?;
             let (object_body, srp_id) = number::streaming::be_u32(object_body)?;
             let mut srp_object = SrpObject {
                 common_object,
-                flags,
+                flags: flag_r.0,
+                flag_remove: flag_r.1 & 0b1 == 0b1,
                 srp_id,
                 tlvs: None,
             };
@@ -61,12 +71,14 @@ impl std::fmt::Display for SrpObject {
             {title}
                 {common_object}
                 flags                  = {flags}
+                flag_remove            = {flag_r}
                 srp_id                 = {srp_id}
             {tlv_str}
             "#,
             title = title,
             common_object = self.common_object,
             flags = self.flags,
+            flag_r = self.flag_remove,
             srp_id = self.srp_id,
             tlv_str = tlvs_str
         )
@@ -103,6 +115,7 @@ pub mod tests {
         let expected_srp_obj = SrpObject {
             common_object: expected_cobj,
             flags: 0,
+            flag_remove: false,
             srp_id: 1,
             tlvs: Some(vec![Tlv::Unknown(unknown_tlv)]),
         };

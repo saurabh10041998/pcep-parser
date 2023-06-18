@@ -18,6 +18,7 @@ use super::types::LspObjectType;
 pub struct LspObject {
     pub common_object: CommonObject,
     pub plsp_id: u32,
+    pub flag_create: bool,
     pub operational_status: OperationalStatus,
     pub flag_administrative: bool,
     pub flag_remove: bool,
@@ -26,12 +27,13 @@ pub struct LspObject {
     pub tlvs: Option<Vec<Tlv>>,
 }
 
-type PlspIdResOperFlagsARSDTuple = (u32, u8, u8, u8, u8, u8, u8);
+type PlspIdResOperFlagsARSDTuple = (u32, u8, u8, u8, u8, u8, u8, u8);
 
 impl LspObject {
     // Parse
     // plsp-id : 20 bits
-    // reserved: 5 bits
+    // reserved: 4 bits
+    // flag_create: 1 bit
     // flags : 12 bits as follows
     // operational_status : 3 bits
     // a flag: 1 bit
@@ -43,7 +45,8 @@ impl LspObject {
     ) -> IResult<&[u8], PlspIdResOperFlagsARSDTuple> {
         bits::bits::<_, _, Error<_>, _, _>(tuple((
             bits::streaming::take(20u32),
-            bits::streaming::take(5u8),
+            bits::streaming::take(4u8),
+            bits::streaming::take(1u8),
             bits::streaming::take(3u8),
             bits::streaming::take(1u8),
             bits::streaming::take(1u8),
@@ -63,11 +66,12 @@ impl LspObject {
             let mut lsp_object = LspObject {
                 common_object,
                 plsp_id: plsp_id_res_oper_flag_a_r_s_d.0,
-                operational_status: plsp_id_res_oper_flag_a_r_s_d.2.into(),
-                flag_administrative: plsp_id_res_oper_flag_a_r_s_d.3 & 0b1 == 0b1,
-                flag_remove: plsp_id_res_oper_flag_a_r_s_d.4 & 0b1 == 0b1,
-                flag_sync: plsp_id_res_oper_flag_a_r_s_d.5 & 0b1 == 0b1,
-                flag_delegate: plsp_id_res_oper_flag_a_r_s_d.6 & 0b1 == 0b1,
+                flag_create: plsp_id_res_oper_flag_a_r_s_d.2 & 0b1 == 0b1,
+                operational_status: plsp_id_res_oper_flag_a_r_s_d.3.into(),
+                flag_administrative: plsp_id_res_oper_flag_a_r_s_d.4 & 0b1 == 0b1,
+                flag_remove: plsp_id_res_oper_flag_a_r_s_d.5 & 0b1 == 0b1,
+                flag_sync: plsp_id_res_oper_flag_a_r_s_d.6 & 0b1 == 0b1,
+                flag_delegate: plsp_id_res_oper_flag_a_r_s_d.7 & 0b1 == 0b1,
                 tlvs: None,
             };
             if !object_body.is_empty() {
@@ -96,6 +100,7 @@ impl std::fmt::Display for LspObject {
             {title}
                 {common_object}
                 plsp_id                      = {plsp_id}
+                flag_create                  = {flag_create}
                 operational_status           = {operational_status}
                 flag_administrative          = {flag_administrative}
                 flag_remove                  = {flag_remove}
@@ -107,6 +112,7 @@ impl std::fmt::Display for LspObject {
             title = title,
             common_object = self.common_object,
             plsp_id = self.plsp_id,
+            flag_create = self.flag_create,
             operational_status = self.operational_status,
             flag_administrative = self.flag_administrative,
             flag_remove = self.flag_remove,
@@ -162,6 +168,7 @@ pub mod tests {
         let expected_lsp_object = LspObject {
             common_object: expected_cobj,
             plsp_id: 235,
+            flag_create: false,
             operational_status: OperationalStatus::Down,
             flag_administrative: true,
             flag_remove: false,
@@ -175,5 +182,62 @@ pub mod tests {
 
         assert!(remaining.is_empty());
         assert_eq!(lsp_object, expected_lsp_object);
+    }
+
+    #[test]
+    fn test_lsp_object_parsing_create_flag() {
+        let input: &[u8] = &[
+            0x20, 0x10, 0x00, 0x5c, 0x00, 0x10, 0x60, 0x89, 0x00, 0x12, 0x00, 0x10, 0x0a, 0x64,
+            0x00, 0x69, 0x00, 0x00, 0x00, 0xc0, 0x0a, 0x64, 0x00, 0x69, 0x0a, 0x64, 0x00, 0x68,
+            0x00, 0x11, 0x00, 0x3a, 0x70, 0x63, 0x65, 0x70, 0x5f, 0x43, 0x6f, 0x6b, 0x65, 0x5f,
+            0x53, 0x68, 0x6f, 0x72, 0x74, 0x65, 0x73, 0x74, 0x54, 0x45, 0x5f, 0x50, 0x4d, 0x2d,
+            0x52, 0x54, 0x52, 0x2d, 0x31, 0x30, 0x35, 0x2d, 0x50, 0x4d, 0x2d, 0x52, 0x54, 0x52,
+            0x2d, 0x31, 0x30, 0x34, 0x2d, 0x4d, 0x50, 0x32, 0x39, 0x5f, 0x64, 0x69, 0x73, 0x63,
+            0x72, 0x5f, 0x31, 0x30, 0x30, 0x00, 0x00, 0x00,
+        ];
+        let (remaining, lsp_object) =
+            LspObject::parse_lsp_object(input).expect("[!! Error while parsing lsp object");
+        let expected_cobj = CommonObject {
+            object_class_type: ObjectClassType::Lsp(LspObjectType::Lsp),
+            flag_ignore: false,
+            flag_process: false,
+            reserved: 0,
+            object_length: 92,
+        };
+        let symbolic_path_name_tlv = SymbolicPathNameTLV {
+            tlv_type: 17,
+            tlv_len: 58,
+            symbolic_path_name: String::from(
+                "pcep_Coke_ShortestTE_PM-RTR-105-PM-RTR-104-MP29_discr_100",
+            ),
+        };
+        let ipv4_lsp_identifiers_tlv = Ipv4LSPIndetifiersTLV {
+            tlv_type: 18,
+            tlv_len: 16,
+            tunnel_sender_address: Ipv4Addr::new(10, 100, 0, 105),
+            tunnel_endpoint_address: Ipv4Addr::new(10, 100, 0, 104),
+            lsp_id: 0,
+            tunnel_id: 192,
+            extended_tunnel_id: 174325865,
+        };
+        let expected_lsp_object = LspObject {
+            common_object: expected_cobj,
+            plsp_id: 262,
+            flag_create: true,
+            flag_administrative: true,
+            flag_remove: false,
+            flag_delegate: true,
+            flag_sync: false,
+            operational_status: OperationalStatus::Down,
+            tlvs: Some(vec![
+                Tlv::Ipv4LSPIndetifiers(ipv4_lsp_identifiers_tlv),
+                Tlv::SymbolicPathName(symbolic_path_name_tlv),
+            ]),
+        };
+        assert!(
+            remaining.is_empty(),
+            "[!!] Nope, Nom did not eat all lsp object"
+        );
+        assert_eq!(expected_lsp_object, lsp_object);
     }
 }

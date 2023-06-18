@@ -5,8 +5,9 @@ Crate aiming for making parsing of PCEP protocol messages.
 ## message type supported
 - [x] OPEN message
 - [x] Keepalive message
-- [x] PCUpdate message. (Not all field are supported, Document the gap)
-- [ ] PCInitiate message. 
+- [x] PCUpdate message. (Not all object and subobjects are supported, Document the gap)
+- [x] PCInitiate message. (Not all object and subobjects are supported, Document the gap)
+- [ ] PCRpt message.
 
 ## todo
 - [x] Fix cicd errors due to TLV adding in open message.
@@ -20,3 +21,5 @@ Crate aiming for making parsing of PCEP protocol messages.
 - [ ] IRO object. 
 - [x] PcUpdate message
 - [ ] Document gap for PcUpdate message.
+- [x] ENDPOINT object
+- [ ] Document gap for PCInitiate message.

@@ -10,6 +10,7 @@ pub enum MessageType {
     PCClose,
     PCRpt,
     PCUpd,
+    PCInitiate,
     UnKnown(u8),
 }
 
@@ -25,6 +26,7 @@ impl std::fmt::Display for MessageType {
             MessageType::PCClose => write!(f, "Close"),
             MessageType::PCRpt => write!(f, "Path Computation LSP State Report"),
             MessageType::PCUpd => write!(f, "Path Computation LSP update request message"),
+            MessageType::PCInitiate => write!(f, "LSP Initiate Request"),
             MessageType::UnKnown(x) => write!(f, "Unknown message type: {}", *x),
         }
     }
@@ -55,6 +57,7 @@ impl TryFrom<u8> for MessageType {
             7 => Ok(Self::PCClose),
             10 => Ok(Self::PCRpt),
             11 => Ok(Self::PCUpd),
+            12 => Ok(Self::PCInitiate),
             _ => Err(MessageTypeError::UnknownMessageTypeError(value)),
         }
     }

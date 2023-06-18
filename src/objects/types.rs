@@ -135,3 +135,30 @@ impl From<u8> for EroObjectType {
         }
     }
 }
+
+#[non_exhaustive]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum EndpointsObjectType {
+    Reserved,
+    Ipv4Addresses,
+    Ipv6Addresses,
+    Ipv4,
+    Ipv6,
+    Generalized,
+    Unassigned,
+}
+
+impl From<u8> for EndpointsObjectType {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => Self::Reserved,
+            1 => Self::Ipv4Addresses,
+            2 => Self::Ipv6Addresses,
+            3 => Self::Ipv4,
+            4 => Self::Ipv6,
+            5 => Self::Generalized,
+            6..=15 => Self::Unassigned,
+            _ => panic!("[!!] Invalid Object type value for METRIC object"),
+        }
+    }
+}

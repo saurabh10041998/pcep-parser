@@ -167,6 +167,8 @@ impl SymbolicPathNameTLV {
         let (remaining, name) = map_res(bytes::streaming::take(tlv_len as usize), |v: &[u8]| {
             str::from_utf8(v)
         })(remaining)?;
+        // Remove Null bytes from end
+        let name = name.trim_end_matches(char::from(0x00));
         let tlv = SymbolicPathNameTLV {
             tlv_type: 17,
             tlv_len,

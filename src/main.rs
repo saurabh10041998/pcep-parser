@@ -12,6 +12,7 @@ mod tlvs;
 use messages::header::CommonHeader;
 use messages::keepalive::KeepAlive;
 use messages::open::Open;
+use messages::pcinitiate::PCInitiate;
 use messages::pcupdate::PcepUpdate;
 use messages::types::MessageType;
 use objects::open::OpenObject;
@@ -51,6 +52,16 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
             Err(e) => {
                 panic!("{:#?}", e);
+            }
+        },
+        MessageType::PCInitiate => match PCInitiate::parse_pcinitiate_message(remaining) {
+            Ok((_remaining, mut pc_initiate_message)) => {
+                println!("[+] Pcep PCInitiate message");
+                pc_initiate_message.common_header = common_header;
+                print!("{}", pc_initiate_message);
+            }
+            Err(e) => {
+                panic!("{:#?}", e)
             }
         },
         _ => {

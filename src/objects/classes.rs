@@ -1,4 +1,5 @@
 use crate::objects::types::BandwidthObjectType;
+use crate::objects::types::EndpointsObjectType;
 use crate::objects::types::EroObjectType;
 use crate::objects::types::LspObjectType;
 use crate::objects::types::LspaObjectType;
@@ -14,6 +15,7 @@ pub enum ObjectClassType {
     Bandwidth(BandwidthObjectType),
     Metric(MetricObjectType),
     Ero(EroObjectType),
+    EndPoints(EndpointsObjectType),
     Unknown((u8, u8)),
 }
 
@@ -23,6 +25,7 @@ impl From<(u8, u8)> for ObjectClassType {
         let object_type = value.1;
         match object_class {
             1 => Self::Open(object_type.into()),
+            4 => Self::EndPoints(object_type.into()),
             5 => Self::Bandwidth(object_type.into()),
             6 => Self::Metric(object_type.into()),
             7 => Self::Ero(object_type.into()),
@@ -46,6 +49,44 @@ impl std::fmt::Display for ObjectClassType {
                 }
                 OpenObjectType::UnAssigned => {
                     write!(f, "(ObjectClassType::Open, OpenObjectType::UnAssigned)")
+                }
+            },
+            Self::EndPoints(endpoints_obj_type) => match endpoints_obj_type {
+                EndpointsObjectType::Reserved => {
+                    write!(
+                        f,
+                        "(ObjectClassType::EndPoints, EndpointsObjectType::Reserved)"
+                    )
+                }
+                EndpointsObjectType::Ipv4Addresses => {
+                    write!(
+                        f,
+                        "(ObjectClassType::EndPoints, EndpointsObjectType::Ipv4Addresses)"
+                    )
+                }
+                EndpointsObjectType::Ipv6Addresses => {
+                    write!(
+                        f,
+                        "(ObjectClassType::EndPoints, EndpointsObjectType::Ipv6Addresses)"
+                    )
+                }
+                EndpointsObjectType::Ipv4 => {
+                    write!(f, "(ObjectClassType::EndPoints, EndpointsObjectType::Ipv4)")
+                }
+                EndpointsObjectType::Ipv6 => {
+                    write!(f, "(ObjectClassType::EndPoints, EndpointsObjectType::Ipv6)")
+                }
+                EndpointsObjectType::Generalized => {
+                    write!(
+                        f,
+                        "(ObjectClassType::EndPoints, EndpointsObjectType::Generalized)"
+                    )
+                }
+                EndpointsObjectType::Unassigned => {
+                    write!(
+                        f,
+                        "(ObjectClassType::EndPoints, EndpointsObjectType::Unassigned)"
+                    )
                 }
             },
             Self::Bandwidth(bandwidth_obj_type) => match bandwidth_obj_type {
