@@ -129,24 +129,24 @@ impl std::fmt::Display for ObjectClassType {
             },
             Self::Metric(metric_obj_type) => match metric_obj_type {
                 MetricObjectType::Reserved => {
-                    write!(f, "(ObjectClassType::Metric, LspaObjectType::Reserved)")
+                    write!(f, "(ObjectClassType::Metric, MetricObjectType::Reserved)")
                 }
                 MetricObjectType::Metric => {
-                    write!(f, "(ObjectClassType::Metric, LspaObjectType::Metric)")
+                    write!(f, "(ObjectClassType::Metric, MetricObjectType::Metric)")
                 }
                 MetricObjectType::Unassigned => {
-                    write!(f, "(ObjectClassType::Metric, LspaObjectType::Unassigned)")
+                    write!(f, "(ObjectClassType::Metric, MetricObjectType::Unassigned)")
                 }
             },
             Self::Ero(ero_obj_type) => match ero_obj_type {
                 EroObjectType::Reserved => {
-                    write!(f, "(ObjectClassType::Metric, LspaObjectType::Reserved)")
+                    write!(f, "(ObjectClassType::Metric, EroObjectType::Reserved)")
                 }
                 EroObjectType::Ero => {
-                    write!(f, "(ObjectClassType::Metric, LspaObjectType::ERO)")
+                    write!(f, "(ObjectClassType::Metric, EroObjectType::ERO)")
                 }
                 EroObjectType::Unassigned => {
-                    write!(f, "(ObjectClassType::Metric, LspaObjectType::Unassigned)")
+                    write!(f, "(ObjectClassType::Metric, EroObjectType::Unassigned)")
                 }
             },
             Self::Lspa(lspa_obj_type) => match lspa_obj_type {

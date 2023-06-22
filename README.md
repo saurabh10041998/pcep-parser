@@ -85,7 +85,7 @@ More message, objects, subobjects and tlvs soon to be added in next release.
 |-----|-----|-----|
 |OPEN| [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | STATEFUL-PCE-CAPABILITY TLV, SR-PCE-CAPABILITY TLV |
 |ENDPOINTS | [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | NAIType: IPv4Addresses supported |
-|ERO| [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | SR subobject [RFC8664](https://datatracker.ietf.org/doc/html/rfc8664) |
+|ERO| [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | SR subobject [RFC8664](https://datatracker.ietf.org/doc/html/rfc8664), Ipv4Prefix Subobject [RFC3209](https://datatracker.ietf.org/doc/html/rfc3209) |
 |SRP| [RFC8231](https://datatracker.ietf.org/doc/html/rfc8231)| No TLV supported yet | 
 |LSP| [RFC8231](https://datatracker.ietf.org/doc/html/rfc8231),[RFC8281](https://datatracker.ietf.org/doc/html/rfc8281) | IPV4LSPIDENTIFIERS-TLV, SYMBOLICPATHNAME-TLV |
 |LSPA | [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | No TLVs |

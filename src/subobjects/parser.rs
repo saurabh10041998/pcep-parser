@@ -2,6 +2,7 @@ use nom::bytes;
 use nom::IResult;
 
 use super::header::SubObject;
+use super::prefix::Ipv4PrefixSubobject;
 use super::sr::SrSubobject;
 use super::types::SubObjectTypes;
 
@@ -14,8 +15,14 @@ impl Parser {
         let (remaining, subobject_body) =
             bytes::streaming::take(subobject_body_len as usize)(remaining)?;
         let subobject_type = match subobject.subobject_type {
-            SubObjectTypes::Ipv4Prefix => {
-                unimplemented!()
+            SubObjectTypes::Ipv4Prefix(_) => {
+                let (remaining, ipv4_pref_subobject) =
+                    Ipv4PrefixSubobject::parse_ipv4_pref_subobject(subobject_body)?;
+                assert!(
+                    remaining.is_empty(),
+                    "[!!] Ipv4 prefix object not parsed fully"
+                );
+                SubObjectTypes::Ipv4Prefix(ipv4_pref_subobject)
             }
             SubObjectTypes::Ipv6Prefix => {
                 unimplemented!()
@@ -61,7 +68,7 @@ pub mod tests {
     use crate::subobjects::sr::{Ipv4AdjNAI, NaiType};
     use std::net::Ipv4Addr;
     #[test]
-    fn test_subobject_parser() {
+    fn test_subobject_parser_for_sr_subobjects() {
         let input: &[u8] = &[
             0x24, 0x10, 0x30, 0x01, 0x05, 0xdc, 0x30, 0x00, 0x0a, 0x68, 0x69, 0x02, 0x0a, 0x68,
             0x69, 0x01,
@@ -86,6 +93,57 @@ pub mod tests {
         };
 
         let expected_subobjects = vec![expected_subobject];
+        assert!(remaining.is_empty());
+        assert_eq!(expected_subobjects, subobjects);
+    }
+
+    #[test]
+    fn test_subobject_parser_for_ipv4_pref_subobjects() {
+        let input: &[u8] = &[
+            0x01, 0x08, 0xc0, 0xa8, 0x96, 0x2d, 0x20, 0x00, 0x01, 0x08, 0xc0, 0xa8, 0x96, 0x2e,
+            0x20, 0x00, 0x01, 0x08, 0xc0, 0xa8, 0x96, 0x4a, 0x20, 0x00, 0x01, 0x08, 0xc0, 0xa8,
+            0x96, 0x49, 0x20, 0x00,
+        ];
+        let (remaining, subobjects) =
+            Parser::parse_subobjects(input).expect("[!!] Error while parsing subobjects");
+        let expected_subobjects = vec![
+            SubObject {
+                flag_l: false,
+                subobject_len: 8,
+                subobject_type: SubObjectTypes::Ipv4Prefix(Ipv4PrefixSubobject {
+                    ipv4_addr: Ipv4Addr::new(192, 168, 150, 45),
+                    pref_len: 32,
+                    reserved: 0,
+                }),
+            },
+            SubObject {
+                flag_l: false,
+                subobject_len: 8,
+                subobject_type: SubObjectTypes::Ipv4Prefix(Ipv4PrefixSubobject {
+                    ipv4_addr: Ipv4Addr::new(192, 168, 150, 46),
+                    pref_len: 32,
+                    reserved: 0,
+                }),
+            },
+            SubObject {
+                flag_l: false,
+                subobject_len: 8,
+                subobject_type: SubObjectTypes::Ipv4Prefix(Ipv4PrefixSubobject {
+                    ipv4_addr: Ipv4Addr::new(192, 168, 150, 74),
+                    pref_len: 32,
+                    reserved: 0,
+                }),
+            },
+            SubObject {
+                flag_l: false,
+                subobject_len: 8,
+                subobject_type: SubObjectTypes::Ipv4Prefix(Ipv4PrefixSubobject {
+                    ipv4_addr: Ipv4Addr::new(192, 168, 150, 73),
+                    pref_len: 32,
+                    reserved: 0,
+                }),
+            },
+        ];
         assert!(remaining.is_empty());
         assert_eq!(expected_subobjects, subobjects);
     }

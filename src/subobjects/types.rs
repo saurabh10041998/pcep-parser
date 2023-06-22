@@ -1,9 +1,10 @@
+use super::prefix::Ipv4PrefixSubobject;
 use super::sr::SrSubobject;
 
 #[non_exhaustive]
 #[derive(Debug, PartialEq, Eq)]
 pub enum SubObjectTypes {
-    Ipv4Prefix,
+    Ipv4Prefix(Ipv4PrefixSubobject),
     Ipv6Prefix,
     Sr(SrSubobject),
     As,
@@ -13,7 +14,7 @@ pub enum SubObjectTypes {
 impl From<u8> for SubObjectTypes {
     fn from(value: u8) -> Self {
         match value {
-            1 => Self::Ipv4Prefix,
+            1 => Self::Ipv4Prefix(Default::default()),
             2 => Self::Ipv6Prefix,
             32 => Self::As,
             36 => Self::Sr(Default::default()),
@@ -25,7 +26,7 @@ impl From<u8> for SubObjectTypes {
 impl std::fmt::Display for SubObjectTypes {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Ipv4Prefix => write!(f, "SubObjectType::Ipv4Prefix"),
+            Self::Ipv4Prefix(x) => write!(f, "{}", x),
             Self::Ipv6Prefix => write!(f, "SubObjectType::Ipv6Prefix"),
             Self::Sr(x) => write!(f, "{}", x),
             Self::As => write!(f, "SubObjectType::AS"),

@@ -42,7 +42,7 @@ impl std::fmt::Display for EroObject {
         let mut subobjects_str = String::new();
         if let Some(ref subobjects) = self.subobjects {
             for subobject in subobjects {
-                let subobject_str = format!("{}", subobject);
+                let subobject_str = format!("{:indent$}{}", "", subobject, indent = 4);
                 subobjects_str.push_str(&subobject_str);
             }
         }
@@ -53,7 +53,7 @@ impl std::fmt::Display for EroObject {
             r#"
                 {title}
                      {common_object}
-                     {subobjects_str}
+                {subobjects_str}
             "#,
             common_object = self.common_object,
             subobjects_str = subobjects_str

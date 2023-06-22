@@ -157,7 +157,7 @@ impl std::fmt::Display for IntendedAttrList {
         if let Some(ref metric_lst) = self.metric_list {
             let mut metric_lst_str = String::new();
             for metric in metric_lst {
-                let metric_str = format!("{}", metric);
+                let metric_str = format!("{:indent$}{}", "", metric, indent = 4);
                 metric_lst_str.push_str(&metric_str);
             }
             attr_lst.push_str(&metric_lst_str);
