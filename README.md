@@ -81,12 +81,20 @@ More message, objects, subobjects and tlvs soon to be added in next release.
 
 
 ## PCEP Objects
-|Object| RFCs | Supported TLVs / Subobject |
+|Object| RFCs | Supported TLVs |
 |-----|-----|-----|
 |OPEN| [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | STATEFUL-PCE-CAPABILITY TLV, SR-PCE-CAPABILITY TLV |
-|ENDPOINTS | [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | NAIType: IPv4Addresses supported |
+|ENDPOINTS | [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | IPv4Addresses supported |
 |ERO| [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | SR subobject [RFC8664](https://datatracker.ietf.org/doc/html/rfc8664), Ipv4Prefix Subobject [RFC3209](https://datatracker.ietf.org/doc/html/rfc3209) |
 |SRP| [RFC8231](https://datatracker.ietf.org/doc/html/rfc8231)| No TLV supported yet | 
 |LSP| [RFC8231](https://datatracker.ietf.org/doc/html/rfc8231),[RFC8281](https://datatracker.ietf.org/doc/html/rfc8281) | IPV4LSPIDENTIFIERS-TLV, SYMBOLICPATHNAME-TLV |
 |LSPA | [RFC5440](https://datatracker.ietf.org/doc/html/rfc5440) | No TLVs |
 |METRIC|[RFC8231](https://datatracker.ietf.org/doc/html/rfc8231) | Igp, Te, Hopcount, Sid-Depth, PathDelay metric supported |
+|BANDWIDTH|[RFC5440](https://datatracker.ietf.org/doc/html/rfc5440)| Requested Bandwidth Type and Bandwidth of an existing TE LSP for which a reoptimization is requested |  
+
+
+## PCEP subobjects
+|Subobject|RFCs|Supported TLVs|
+|---|---|---|
+| SR-ERO | [RFC8664](https://datatracker.ietf.org/doc/html/rfc8664) | NAIType: Ipv4 Adjacency NAIType supported |
+| IPv4Pefix | [RFC3209](https://datatracker.ietf.org/doc/html/rfc3209) | |
